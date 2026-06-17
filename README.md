@@ -188,3 +188,106 @@ npm run start:server
 npm run start:client
 
 ```
+
+
+
+
+
+---
+
+
+Aqui está exclusivamente o trecho do `README.md` detalhando a nova adição do **Dashboard Avançado em Angular**, pronto para ser copiado e colado no seu arquivo principal.
+
+---
+
+## 🇧🇷 Nova Adição: Dashboard Avançado em Angular (Nível Enterprise)
+
+Esta seção documenta a camada de monitoramento e consumo corporativo adicionada ao ecossistema do Lattice Sync. Em vez de uma interface simples, o sistema agora conta com um painel administrativo robusto construído em **Angular** para gerenciar e visualizar fluxos de dados massivos em tempo real.
+
+### 🏗️ Integração na Arquitetura
+
+O Dashboard Angular atua como um nó observador e analítico de alta performance conectado diretamente ao cluster:
+
+```
+[ Servidor Relay (Stateless) ] <--- WebSocket (MessagePack) ---> [ Dashboard Angular ]
+                                                                      ├── RxJS Streams (Ingestão)
+                                                                      └── Signals (Renderização)
+
+```
+
+### 🧠 Motivação Técnica e Recursos Implementados
+
+* **Gerenciamento de Estado Ultra-Rápido (Angular Signals):** O motor Lattice Sync processa mutações em rajadas de milissegundos. Para evitar o gargalo tradicional do mecanismo de *Change Detection* do Angular, utilizamos **Signals**. O estado reativo é atualizado de forma cirúrgica, modificando apenas os elementos exatos do DOM que sofreram mutações, mantendo a interface estável a 60 FPS.
+* **Manipulação de Streams Complexos (RxJS):** A camada de transporte utiliza operadores RxJS para gerenciar o ciclo de vida da conexão do WebSocket bruto. Implementamos estratégias de *Exponential Backoff* usando `retry()` para garantir a resiliência (Chaos Engineering) e tratamento de erros assíncronos sem derrubar a aplicação.
+* **Telemetria Baseada em Grafos de Operações:** O painel traduz os deltas e os *Lamport Timestamps* em gráficos de performance de rede em tempo real, calculando a latência exata entre a geração da operação no cliente e a entrega no painel.
+
+### 🛠️ Atualização do Tech Stack
+
+| Camada | Tecnologia | Motivação Técnica |
+| --- | --- | --- |
+| **Enterprise Dashboard** | Angular (Latest) / Signals / RxJS | Processamento de streams assíncronos de alta frequência e mutações de estado cirúrgicas sem sobrecarga computacional. |
+
+### 🚀 Como Executar o Dashboard
+
+Certifique-se de que o servidor Relay e o Redis estejam rodando antes de iniciar o painel:
+
+```bash
+# Navegue até o diretório do projeto Angular
+cd projects/lattice-dashboard
+
+# Instale as dependências locais se necessário
+npm install
+
+# Inicie o servidor de desenvolvimento do Angular
+npm run start
+
+```
+
+> 🎯 **Palavras-chave :** Angular, RxJS Streams, State Management (Signals), TypeScript, WebSocket Integration, Enterprise Architecture.
+
+---
+
+## 🇺🇸 New Addition: Advanced Angular Dashboard (Enterprise-Grade)
+
+This section documents the corporate-grade monitoring and operational layer added to the Lattice Sync ecosystem. Moving away from standard, lightweight views, the system now features a robust management dashboard built on **Angular** to ingest and visualize massive real-time operational data streams.
+
+### 🏗️ Architectural Integration
+
+The Angular Dashboard operates as a high-performance analytical and observer node connected directly to the transport layer:
+
+```
+[ Stateless Relay Server ] <--- WebSocket (MessagePack) ---> [ Angular Dashboard ]
+                                                                   ├── RxJS Streams (Ingestion)
+                                                                   └── Signals (Rendering)
+
+```
+
+### 🧠 Technical Motivation & Core Features
+
+* **Ultra-Fast State Management (Angular Signals):** The Lattice Sync engine dispatches mutations within millisecond windows. To bypass standard Angular *Change Detection* bottlenecks, we leverage **Signals**. The reactive state triggers surgical DOM updates, targeting only the exact elements modified by the incoming deltas, preserving a smooth 60 FPS UX.
+* **Complex Stream Handling (RxJS):** The transport pipeline utilizes RxJS reactive operators to govern the raw WebSocket full-duplex lifecycle. We implemented *Exponential Backoff* retry strategies using `retry()` to maintain alignment with our Chaos Engineering principles, alongside safe asynchronous error boundaries.
+* **Operation Graph Telemetry:** The dashboard parses operational deltas and *Lamport Timestamps* into real-time network health metrics, tracking structural synchronization delays and processing throughput.
+
+### 🛠️ Tech Stack Update
+
+| Layer | Technology | Technical Motivation |
+| --- | --- | --- |
+| **Enterprise Dashboard** | Angular (Latest) / Signals / RxJS | High-frequency asynchronous stream orchestration and lightweight reactive state mutations bypassing heavy change detection loops. |
+
+### 🚀 Running the Dashboard
+
+Ensure the core Relay server and your Redis daemon are active before spinning up the panel:
+
+```bash
+# Navigate to the Angular project directory
+cd projects/lattice-dashboard
+
+# Install local dependencies if required
+npm install
+
+# Start the Angular local development server
+npm run start
+
+```
+
+> 🎯 **Resume :** Angular, RxJS Streams, State Management (Signals), TypeScript, WebSocket Integration, Enterprise Architecture.

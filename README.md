@@ -434,3 +434,201 @@ Autonomous agents need a shared state. Lattice Sync serves as a decentralized st
 DriftGuard nodes can use Lattice Sync to maintain consistent auto-remediation policies across a cluster, even during network partitions, ensuring no node makes conflicting decisions.
 
 > **Engineering Note:** In all cases, Lattice Sync is added as a lightweight dependency (TypeScript library + relay container), without requiring deep changes to the existing architecture.
+
+---
+# 📐 Lattice Sync Engine — Explicação do Diagrama de Arquitetura
+
+
+
+## 🇧🇷 Português
+
+### 📊 Diagrama de Arquitetura do Sistema
+
+O diagrama abaixo apresenta uma visão unificada do ecossistema **Lattice Sync Engine**, integrando a arquitetura central com as funcionalidades avançadas, as melhorias de engenharia e a interoperabilidade com os demais projetos do portfólio.
+
+```mermaid
+graph TB
+    subgraph "Lattice Sync Engine - Visão Geral / Overview"
+        direction TB
+
+        subgraph "Arquitetura Central / Core Architecture"
+            ClientA["Cliente A<br/>(Core Engine)"]
+            ClientB["Cliente B<br/>(Core Engine)"]
+            Relay["Servidor Relay<br/>(Stateless)"]
+            Redis["Redis Pub/Sub"]
+            ClientA <-->|"WebSocket + MessagePack"| Relay
+            ClientB <-->|"WebSocket + MessagePack"| Relay
+            Relay <-->|"Canais de Broadcast"| Redis
+        end
+
+        subgraph "Funcionalidades Avançadas / Advanced Features"
+            direction LR
+            E2EE["🔐 Criptografia Ponta a Ponta<br/>(E2EE)"]
+            CRDTs["🧩 Tipos de CRDT<br/>(RGA, LWW, OR-Set, PN-Counter)"]
+            Persist["💾 Persistência<br/>(PostgreSQL / Snapshots)"]
+            Compress["📦 Compressão Binária<br/>(zstd, brotli)"]
+            Auth["🔒 Autenticação por Sala<br/>(JWT)"]
+            Undo["⏪ Undo/Redo<br/>Colaborativo"]
+        end
+
+        subgraph "Melhorias de Engenharia / Engineering Improvements"
+            direction LR
+            Dashboard["📊 Dashboard Angular<br/>(Chaos Reports, Signals, RxJS)"]
+            Metrics["📈 Métricas Prometheus<br/>(Conexões, Throughput, Latência)"]
+            Tests["🧪 Testes Multi-plataforma<br/>(Browser, Node.js, WASM)"]
+            CLI["💻 CLI Administrativa<br/>(Go / Rust)"]
+        end
+
+        subgraph "Interoperabilidade / Ecosystem Integration"
+            direction LR
+            PulseOps["📊 Pulse-Ops<br/>Colaboração em Operações Críticas"]
+            Tenentis["🏢 Tenentis OS<br/>Edição de Schemas Multi-Tenant"]
+            KoreAI["🤖 KoreAI<br/>Sincronização de Contexto entre Agentes"]
+            DriftGuard["🛡️ DriftGuard<br/>Coordenação de Políticas de Remediação"]
+        end
+
+        ClientA -.-> E2EE
+        ClientB -.-> E2EE
+        ClientA -.-> CRDTs
+        ClientB -.-> CRDTs
+        ClientA -.-> Undo
+        ClientB -.-> Undo
+        Relay --> Persist
+        Relay --> Compress
+        Relay --> Auth
+        Relay --> Metrics
+        Relay --> Dashboard
+        Tests --> ClientA
+        Tests --> ClientB
+        Tests --> Relay
+        CLI --> Relay
+
+        PulseOps -.-> Relay
+        Tenentis -.-> Relay
+        KoreAI -.-> Relay
+        DriftGuard -.-> Relay
+    end
+```
+
+### 🧩 Explicação do Diagrama
+
+1. **Arquitetura Central (Centro)**
+   - Os clientes A e B representam a biblioteca `Core Engine` executando em diferentes dispositivos (navegador, Node.js ou WASM).
+   - A comunicação ocorre via **WebSocket** com serialização binária (**MessagePack**), garantindo baixa latência.
+   - O **Servidor Relay** é completamente *stateless* e apenas retransmite mensagens.
+   - A escalabilidade horizontal é obtida através do **Redis Pub/Sub**, que distribui os eventos entre múltiplas instâncias do relay.
+
+2. **Funcionalidades Avançadas (Esquerda)**
+   - **E2EE**: A criptografia é aplicada diretamente nos clientes (Core Engine) antes de enviar qualquer delta ao relay.
+   - **Tipos de CRDT**: O motor suporta múltiplas estruturas de dados convergentes, todas processadas localmente pelos clientes.
+   - **Undo/Redo**: O histórico reversível é gerenciado no lado do cliente, permitindo desfazer operações mesmo após edições remotas.
+   - **Persistência, Compressão e Autenticação**: São funcionalidades que atuam no relay ou entre o relay e os clientes. A persistência salva logs e snapshots no PostgreSQL; a compressão reduz o tráfego; a autenticação JWT protege as salas.
+
+3. **Melhorias de Engenharia (Direita)**
+   - **Dashboard Angular**: Consome telemetria do relay e exibe gráficos de desempenho sob testes de caos.
+   - **Métricas Prometheus**: O relay expõe métricas que são coletadas para monitoramento.
+   - **Testes Multi-plataforma**: Validam todo o ecossistema (clientes, relay) em navegador, Node.js e Rust/WASM.
+   - **CLI Administrativa**: Ferramenta para operadores gerenciarem o relay (desconectar usuários, forçar snapshots).
+
+4. **Interoperabilidade (Base)**
+   - Os projetos **Pulse-Ops**, **Tenentis OS**, **KoreAI** e **DriftGuard** se conectam ao mesmo ecossistema do Lattice Sync. Eles podem embutir a biblioteca cliente (Core Engine) para adicionar colaboração em tempo real e resiliência offline aos seus próprios fluxos.
+
+---
+
+## 🇺🇸 English
+
+### 📊 System Architecture Diagram
+
+The diagram below presents a unified view of the **Lattice Sync Engine** ecosystem, integrating the core architecture with advanced features, engineering improvements, and interoperability with other portfolio projects.
+
+```mermaid
+graph TB
+    subgraph "Lattice Sync Engine - Visão Geral / Overview"
+        direction TB
+
+        subgraph "Arquitetura Central / Core Architecture"
+            ClientA["Client A<br/>(Core Engine)"]
+            ClientB["Client B<br/>(Core Engine)"]
+            Relay["Relay Server<br/>(Stateless)"]
+            Redis["Redis Pub/Sub"]
+            ClientA <-->|"WebSocket + MessagePack"| Relay
+            ClientB <-->|"WebSocket + MessagePack"| Relay
+            Relay <-->|"Broadcast Channels"| Redis
+        end
+
+        subgraph "Advanced Features"
+            direction LR
+            E2EE["🔐 End-to-End Encryption<br/>(E2EE)"]
+            CRDTs["🧩 CRDT Types<br/>(RGA, LWW, OR-Set, PN-Counter)"]
+            Persist["💾 Persistence<br/>(PostgreSQL / Snapshots)"]
+            Compress["📦 Binary Compression<br/>(zstd, brotli)"]
+            Auth["🔒 Room-Level Auth<br/>(JWT)"]
+            Undo["⏪ Collaborative<br/>Undo/Redo"]
+        end
+
+        subgraph "Engineering Improvements"
+            direction LR
+            Dashboard["📊 Angular Dashboard<br/>(Chaos Reports, Signals, RxJS)"]
+            Metrics["📈 Prometheus Metrics<br/>(Connections, Throughput, Latency)"]
+            Tests["🧪 Multi-Platform Tests<br/>(Browser, Node.js, WASM)"]
+            CLI["💻 Administrative CLI<br/>(Go / Rust)"]
+        end
+
+        subgraph "Ecosystem Integration"
+            direction LR
+            PulseOps["📊 Pulse-Ops<br/>Critical Operations Collaboration"]
+            Tenentis["🏢 Tenentis OS<br/>Multi-Tenant Schema Editing"]
+            KoreAI["🤖 KoreAI<br/>Context Sync Among AI Agents"]
+            DriftGuard["🛡️ DriftGuard<br/>Remediation Policy Coordination"]
+        end
+
+        ClientA -.-> E2EE
+        ClientB -.-> E2EE
+        ClientA -.-> CRDTs
+        ClientB -.-> CRDTs
+        ClientA -.-> Undo
+        ClientB -.-> Undo
+        Relay --> Persist
+        Relay --> Compress
+        Relay --> Auth
+        Relay --> Metrics
+        Relay --> Dashboard
+        Tests --> ClientA
+        Tests --> ClientB
+        Tests --> Relay
+        CLI --> Relay
+
+        PulseOps -.-> Relay
+        Tenentis -.-> Relay
+        KoreAI -.-> Relay
+        DriftGuard -.-> Relay
+    end
+```
+
+### 🧩 Diagram Explanation
+
+1. **Core Architecture (Center)**
+   - Clients A and B represent the `Core Engine` library running on different devices (browser, Node.js, or WASM).
+   - Communication occurs via **WebSocket** with binary serialization (**MessagePack**), ensuring low latency.
+   - The **Relay Server** is completely *stateless* and only forwards messages.
+   - Horizontal scalability is achieved through **Redis Pub/Sub**, which distributes events among multiple relay instances.
+
+2. **Advanced Features (Left)**
+   - **E2EE**: Encryption is applied directly on the clients (Core Engine) before sending any delta to the relay.
+   - **CRDT Types**: The engine supports multiple convergent data structures, all processed locally by clients.
+   - **Undo/Redo**: Reversible history is managed client-side, allowing operations to be undone even after remote edits.
+   - **Persistence, Compression, and Authentication**: Features that operate on the relay or between the relay and clients. Persistence saves logs and snapshots to PostgreSQL; compression reduces traffic; JWT authentication secures rooms.
+
+3. **Engineering Improvements (Right)**
+   - **Angular Dashboard**: Consumes relay telemetry and displays performance graphs under chaos tests.
+   - **Prometheus Metrics**: The relay exposes metrics collected for monitoring.
+   - **Multi-Platform Tests**: Validate the entire ecosystem (clients, relay) across browser, Node.js, and Rust/WASM.
+   - **Administrative CLI**: Tool for operators to manage the relay (disconnect users, force snapshots).
+
+4. **Ecosystem Integration (Bottom)**
+   - The **Pulse-Ops**, **Tenentis OS**, **KoreAI**, and **DriftGuard** projects connect to the same Lattice Sync ecosystem. They can embed the client library (Core Engine) to add real-time collaboration and offline resilience to their own workflows.
+```
+
+
+
+

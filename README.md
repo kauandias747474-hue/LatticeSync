@@ -1,4 +1,3 @@
-
 # 📐 Lattice Sync Engine
 
 ---
@@ -291,3 +290,147 @@ npm run start
 ```
 
 > 🎯 **Resume :** Angular, RxJS Streams, State Management (Signals), TypeScript, WebSocket Integration, Enterprise Architecture.
+
+# 📐 Lattice Sync Engine — Funcionalidades Avançadas & Ecossistema
+
+---
+
+## 🇧🇷 Português
+
+### ✨ Funcionalidades Avançadas
+
+#### 🔐 Criptografia Ponta a Ponta (E2EE)
+Implementação de criptografia no cliente utilizando **Web Crypto API** e **libsodium**, garantindo que o relay jamais tenha acesso ao conteúdo das operações. Apenas os participantes da sala possuem as chaves para decifrar os deltas.
+
+#### 🧩 Suporte a Outros Tipos de CRDT
+Além do **RGA (Replicated Growable Array)**, o motor inclui:
+- **LWW-Register:** Para campos escalares com resolução *last-writer-wins*.
+- **OR-Set:** Para coleções não ordenadas com adição/remoção comutativa.
+- **PN-Counter:** Para contadores distribuídos consistentes.
+
+#### 💾 Persistência de Logs e Snapshots
+Os logs de operações são salvos em **PostgreSQL** (ou em disco). Snapshots periódicos permitem que clientes façam *catch-up* rápido após longos períodos offline, sem dependência do histórico completo.
+
+#### 📦 Compressão Binária de Operações
+Payloads são comprimidos com **zstd** e **brotli** antes do envio, reduzindo ainda mais o consumo de banda e o custo de rede.
+
+#### 🔒 Autenticação e Autorização por Sala
+Tokens **JWT** são validados no *upgrade* do WebSocket, garantindo que apenas usuários autorizados acessem um workspace específico, com granularidade de permissões.
+
+#### ⏪ Versionamento e Undo/Redo Colaborativo
+Histórico reversível completo, com suporte a desfazer/refazer mesmo após a chegada de operações remotas de outros usuários, mantendo a integridade causal.
+
+---
+
+### 🛠️ Melhorias de Engenharia
+
+#### 📊 Simulações de Cenários Caóticos com Relatório
+O **Angular Dashboard** exibe gráficos de desempenho sob latência e particionamento, gerados automaticamente pelos testes de caos. Operadores visualizam degradação e recuperação em tempo real.
+
+#### 📈 Métricas Prometheus para o Relay
+O relay expõe métricas como contagem de conexões, *throughput* de operações e latência do Pub/Sub, permitindo monitoramento com **Prometheus** e **Grafana**.
+
+#### 🧪 Testes de Integração Multi-plataforma
+Suíte de testes validando o Lattice Sync executado simultaneamente em navegador, Node.js e Rust via WASM, assegurando interoperabilidade entre plataformas.
+
+#### 💻 CLI Administrativa
+Ferramenta de linha de comando (Go ou Rust) para inspecionar salas, desconectar usuários, forçar snapshots e gerenciar o ciclo de vida do relay.
+
+---
+
+### 📚 Documentação Extra
+
+- **Diagramas de sequência UML** ilustrando o fluxo de uma operação (PUT local → delta → transmissão → aplicação nos pares).
+- **Estudo de caso** comparando Google Docs (OT) com Lattice Sync (CRDT), destacando vantagens arquiteturais.
+- **Guia de contribuição** com boas práticas para código CRDT e *workflow* de pull requests.
+
+---
+
+### 🌐 Interoperabilidade com o Ecossistema de Projetos
+
+O Lattice Sync foi projetado como um módulo de infraestrutura genérico. Ele pode ser embutido em qualquer um dos meus outros sistemas para adicionar colaboração em tempo real e resiliência offline.
+
+#### 📊 Pulse-Ops — Colaboração em Operações Críticas
+O Pulse-Ops é um centro de comando de operações em tempo real. Ao integrar o Lattice Sync, dois operadores podem ver e controlar o mesmo painel simultaneamente. Se um deles acionar o "Panic Mode", a ação é propagada deterministicamente, mesmo que um cliente esteja temporariamente offline.
+
+#### 🏢 Tenentis OS — Edição Colaborativa de Schemas Multi-Tenant
+No Tenentis OS, cada tenant pode ter múltiplos administradores. Com o Lattice Sync, eles editam o schema dinâmico (campos customizados) colaborativamente, com merge automático de conflitos via CRDTs, sem locks pessimistas.
+
+#### 🤖 KoreAI — Sincronização de Contexto entre Agentes de IA
+Agentes autônomos precisam compartilhar um estado comum. O Lattice Sync funciona como barramento de estado descentralizado, permitindo que agentes de IA leiam e escrevam em um quadro de conhecimento compartilhado sem um coordenador central.
+
+#### 🛡️ DriftGuard — Coordenação de Políticas de Remediação
+Os nós do DriftGuard podem usar o Lattice Sync para manter políticas de auto-remediação consistentes em um cluster, mesmo durante partições de rede, garantindo que nenhum nó tome decisões conflitantes.
+
+> **Nota de engenharia:** Em todos os casos, o Lattice Sync é adicionado como uma dependência leve (biblioteca TypeScript + container do relay), sem exigir mudanças profundas na arquitetura existente.
+
+---
+
+## 🇺🇸 English
+
+### ✨ Advanced Features
+
+#### 🔐 End-to-End Encryption (E2EE)
+Client-side encryption using the **Web Crypto API** and **libsodium** ensures the relay never has access to operation content. Only room participants hold the keys to decrypt deltas.
+
+#### 🧩 Additional CRDT Types
+Beyond **RGA (Replicated Growable Array)**, the engine now includes:
+- **LWW-Register:** For scalar fields with last-writer-wins resolution.
+- **OR-Set:** For unordered collections with commutative add/remove.
+- **PN-Counter:** For consistent distributed counters.
+
+#### 💾 Log and Snapshot Persistence
+Operation logs are persisted to **PostgreSQL** (or disk). Periodic snapshots allow clients to catch up quickly after extended offline periods without relying on the full history.
+
+#### 📦 Binary Operation Compression
+Payloads are compressed with **zstd** and **brotli** before transmission, further reducing bandwidth usage and network costs.
+
+#### 🔒 Room-Level Authentication and Authorization
+**JWT** tokens are validated at WebSocket upgrade, ensuring only authorized users access a specific workspace with granular permissions.
+
+#### ⏪ Collaborative Undo/Redo and Versioning
+Full reversible history with support for undo/redo even after remote operations from other users, preserving causal integrity.
+
+---
+
+### 🛠️ Engineering Improvements
+
+#### 📊 Chaos Simulation Reports
+The **Angular Dashboard** displays performance graphs under latency and partitioning, automatically generated by chaos tests. Operators visualize degradation and recovery in real time.
+
+#### 📈 Prometheus Metrics for the Relay
+The relay exposes metrics such as connection count, operation throughput, and Pub/Sub latency, enabling monitoring with **Prometheus** and **Grafana**.
+
+#### 🧪 Multi-Platform Integration Tests
+A test suite validates Lattice Sync running simultaneously in browser, Node.js, and Rust via WASM, ensuring cross-platform interoperability.
+
+#### 💻 Administrative CLI
+A command-line tool (Go or Rust) for inspecting rooms, disconnecting users, forcing snapshots, and managing the relay lifecycle.
+
+---
+
+### 📚 Extra Documentation
+
+- **UML Sequence Diagrams** illustrating the flow of an operation (local PUT → delta → transmission → application on peers).
+- **Case Study** comparing Google Docs (OT) with Lattice Sync (CRDT), highlighting architectural advantages.
+- **Contribution Guide** with best practices for CRDT code and pull request workflow.
+
+---
+
+### 🌐 Interoperability with the Project Ecosystem
+
+Lattice Sync was designed as a generic infrastructure module. It can be embedded into any of my other systems to add real-time collaboration and offline resilience.
+
+#### 📊 Pulse-Ops — Critical Operations Collaboration
+Pulse-Ops is a real-time operations command center. By integrating Lattice Sync, two operators can view and control the same dashboard simultaneously. If one triggers "Panic Mode", the action propagates deterministically, even if a client is temporarily offline.
+
+#### 🏢 Tenentis OS — Collaborative Multi-Tenant Schema Editing
+In Tenentis OS, each tenant can have multiple administrators. With Lattice Sync, they can collaboratively edit dynamic schemas (custom fields), with automatic conflict resolution via CRDTs, without pessimistic locks.
+
+#### 🤖 KoreAI — Context Synchronization Among AI Agents
+Autonomous agents need a shared state. Lattice Sync serves as a decentralized state bus, allowing AI agents to read and write to a shared knowledge board without a central coordinator.
+
+#### 🛡️ DriftGuard — Remediation Policy Coordination
+DriftGuard nodes can use Lattice Sync to maintain consistent auto-remediation policies across a cluster, even during network partitions, ensuring no node makes conflicting decisions.
+
+> **Engineering Note:** In all cases, Lattice Sync is added as a lightweight dependency (TypeScript library + relay container), without requiring deep changes to the existing architecture.
